@@ -26,8 +26,8 @@ def main():
 	
 	# Print Balances and Rewards
 	for currency in ['usd', 'cad', 'aud', 'btc']:
-		print("Total Balance in %s: %.09f" % (currency, (scraper.get_price(currency) * scraper.get_total_tokens())))
-		print("Redistribution rewards in %s: %.09f" % (currency, (scraper.get_price(currency) * scraper.get_redistribution())))
+		print("Total Balance in %s: %.09f" % (currency, scraper.convert_total_balance(currency)))
+		print("Redistribution rewards in %s: %.09f" % (currency, scraper.convert_redistribution(currency)))
 		
 if __name__ == '__main__':
 	main()

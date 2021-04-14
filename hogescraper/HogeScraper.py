@@ -62,3 +62,11 @@ class HogeScraper(object):
 			).text
 		)
 		return float(data['market_data']['current_price'][currency.lower()])
+
+	def convert_total_balance(self, currency: str = 'usd') -> float:
+		"""Convert value of all held tokens to `currency`"""
+		return float(self.get_price(currency) * self.get_total_tokens())
+
+	def convert_redistribution(self, currency: str = 'usd') -> float:
+		"""Convert value of all held redistribution rewards to `currency`"""
+		return float(self.get_price(currency) * self.get_redistribution())
