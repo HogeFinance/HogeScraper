@@ -11,9 +11,11 @@ class HogeScraper(object):
 		self.set_user_address(user_address)
 
 	def contract(self):
+		"""Return contract wrapper object"""
 		return self._contract
 
 	def w3(self):
+		"""Return w3 wrapper object"""
 		return self.contract().w3()
 
 	def set_user_address(self, address: str):
