@@ -13,16 +13,11 @@ def main():
 	# Print Prices
 	print("Price in USD: %.09f" % scraper.get_price())
 	print("Price in CAD: %.09f" % scraper.get_price('cad'))
-
-	# Print Balances & Rewards
-	print("Total Balance in USD: %.09f" % (scraper.get_price() * scraper.get_total_tokens()))
-	print("Redistribution rewards in USD: %.09f" % (scraper.get_price() * scraper.get_redistribution()))
-	print("Total Balance in CAD: %.09f" % (scraper.get_price('cad') * scraper.get_total_tokens()))
-	print("Redistribution rewards in CAD: %.09f" % (scraper.get_price('cad') * scraper.get_redistribution()))
-	print("Total Balance in AUD: %.09f" % (scraper.get_price('aud') * scraper.get_total_tokens()))
-	print("Redistribution rewards in AUD: %.09f" % (scraper.get_price('aud') * scraper.get_redistribution()))
-	print("Total Balance in BTC: %.08f" % (scraper.get_price('btc') * scraper.get_total_tokens()))
-	print("Redistribution rewards in BTC: %.08f" % (scraper.get_price('btc') * scraper.get_redistribution()))
-
+	
+	# Print Balances and Rewards
+	for currency in ['usd', 'cad', 'aud', 'btc']:
+		print("Total Balance in %s: %.09f" % (currency, (scraper.get_price(currency) * scraper.get_total_tokens())))
+		print("Redistribution rewards in %s: %.09f" % (currency, (scraper.get_price(currency) * scraper.get_redistribution())))
+		
 if __name__ == '__main__':
 	main()
