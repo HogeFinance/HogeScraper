@@ -18,8 +18,8 @@ class HogeScraper(object):
 
 	def set_user_address(self, address: str):
 		"""Set address of user to scrape"""
-		if self.contract().w3().is_address(address):
-			self._user = self.contract().w3().to_checksum_address(address)
+		if self.w3().is_address(address):
+			self._user = self.w3().to_checksum_address(address)
 
 	def get_user_address(self) -> str:
 		"""Get user address"""
@@ -40,11 +40,11 @@ class HogeScraper(object):
 		"""Get sum of purchased tokens"""
 		transfers = self.get_buys()
 		buys = [transfer['args']['value'] for transfer in transfers]
-		return float(sum([self.contract().w3().from_wei(buy, 'nano') for buy in buys]))
+		return float(sum([self.w3().from_wei(buy, 'nano') for buy in buys]))
 
 	def get_total_tokens(self) -> float:
 		"""Get total Hoge balance"""
-		return float(self.contract().w3().from_wei(
+		return float(self.w3().from_wei(
 			self.contract().get_contract().functions.balanceOf(self.get_user_address()).call(), 'nano'
 		))
 
