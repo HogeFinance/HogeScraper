@@ -1,7 +1,6 @@
 import json
 
 import requests
-from web3 import Web3
 
 from .Contract import Contract
 
@@ -38,17 +37,17 @@ class HogeScraper(object):
 		"""Get sum of purchased tokens"""
 		transfers = self.get_buys()
 		buys = [transfer['args']['value'] for transfer in transfers]
-		return sum([self.contract().get_w3().fromWei(buy, 'nano') for buy in buys])
+		return float(sum([self.contract().get_w3().fromWei(buy, 'nano') for buy in buys]))
 
 	def get_total_tokens(self) -> float:
 		"""Get total Hoge balance"""
-		return self.contract().get_w3().fromWei(
+		return float(self.contract().get_w3().fromWei(
 			self.contract().get_contract().functions.balanceOf(self.get_user_address()).call(), 'nano'
-		)
+		))
 
 	def get_redistribution(self) -> float:
 		"""Calculate redistribution earnings"""
-		return self.get_total_tokens() - self.get_bought_tokens()
+		return float(self.get_total_tokens() - self.get_bought_tokens())
 
 	def get_price(self, currency: str = 'usd') -> float:
 		"""Get hoge price in numerous currencies"""
