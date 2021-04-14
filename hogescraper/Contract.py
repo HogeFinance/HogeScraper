@@ -61,19 +61,19 @@ class Contract(object):
 		return self.get_contract().functions.symbol().call()
 
 	def decimals(self) -> int:
-		"""Return token symbol"""
+		"""Return decimal points in token"""
 		return int(self.get_contract().functions.decimals().call())
 
 	def total_supply(self) -> float:
-		"""Return token symbol"""
+		"""Return token total supply"""
 		return float(self.get_contract().functions.totalSupply().call())
 
 	def name(self) -> str:
-		"""Return token symbol"""
+		"""Return token name"""
 		return self.get_contract().functions.name().call()
 
 	def allowance(self, owner, spender) -> float:
-		"""Return token symbol"""
+		"""Return allocated allowance from owner to spender"""
 		if self.w3().is_address(owner) and self.w3().is_address(spender):
 			owner = self.w3().to_checksum_address(owner)
 			spender = self.w3().to_checksum_address(spender)
