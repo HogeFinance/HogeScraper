@@ -1,3 +1,4 @@
-__all__ = ["HogeScraper"]
+__all__ = ["HogeScraper", "Contract"]
 
 from .HogeScraper import HogeScraper
+from .Contract import Contract
