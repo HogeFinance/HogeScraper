@@ -67,9 +67,9 @@ if __name__ == '__main__':
 Future versions may include the ability to run off a local full node instead of infura. More documentation to come.
 
 ## Donations:
+To help support development of this and any other tools I write that you may enjoy, please consider sending a donation to one of the following addresses:
 
     ETH: 0x1cc56853360Dcf5978FcbFf95E6a64FfB9844A6b
     HOGE: 0x1cc56853360Dcf5978FcbFf95E6a64FfB9844A6b
     BTC: bc1q36ktet78lhhn9ac2nghmqt9ce4h42vfcverc35
-    DOGE: DRUjcPML6UhSKumgJwpexe4DWz5H91dwM7
-    
+    DOGE: DRUjcPML6UhSKumgJwpexe4DWz5H91dwM7  
