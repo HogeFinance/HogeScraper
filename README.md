@@ -5,6 +5,14 @@ HogeScraper is an all-in-one utility to let you track your purchased hoge, curre
 
 It currently leverages several sources to get its data. Primarily it reads from the ethereum blockchain, and as such an [Infura API Key](https://infura.io/) is required. This allows HogeScraper to filter transfer events sent to your address(your Hoge purchases) as well as query the contract for your current balance. Additionally price data is fed in from coingeckos API.
 
+# Installation:
+To install HogeScraper enter the following commands(Windows, Linux, or macOS)
+```bash
+git clone https://github.com/Durendal/HogeScraper.git
+cd HogeScraper
+pip install .
+```
+
 # Basic Use:
 
 ```python
@@ -28,6 +36,29 @@ def main():
 	for currency in ['usd', 'cad', 'aud', 'btc']:
 		print("Total Balance in %s: %.09f" % (currency, scraper.convert_total_balance(currency)))
 		print("Redistribution rewards in %s: %.09f" % (currency, scraper.convert_redistribution(currency)))
+		
+if __name__ == '__main__':
+	main()
+```
+
+# Other ERC-20s
+Although HogeScraper will work out of the box with the HOGE smart contract, you can specify a custom ABI and smart contract address to the Contract class, in theory its wrapped methods should work with any ERC-20 however this has not been tested.
+```python
+from hogescraper import HogeScraper
+
+def main():
+	abi = open('CONTRACT_ABI.json').read()
+	contract_address = 'CUSTOM_ERC20_CONTRACT_ADDRESS'
+	scraper = HogeScraper('INFURA_API_KEY')
+	scraper.set_user_address('YOUR_ETH_ADDRESS_HOLDING_ERC20')
+	scraper.contract().set_abi(abi)
+	scraper.contract().set_contract_address(contract_address)
+	scraper.contract().set_contract()
+
+	# Token info
+	print("Symbol: %s" % scraper.contract().symbol())
+	print("Current Balance: %.09f" % scraper.get_total_tokens())
+	print("Current Buys: %.09f" % scraper.get_bought_tokens())
 		
 if __name__ == '__main__':
 	main()
