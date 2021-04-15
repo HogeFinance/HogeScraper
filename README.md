@@ -41,7 +41,7 @@ if __name__ == '__main__':
 	main()
 ```
 
-# Other ERC-20s
+# Other ERC-20s:
 Although HogeScraper will work out of the box with the HOGE smart contract, you can specify a custom ABI and smart contract address to the Contract class, in theory its wrapped methods should work with any ERC-20 however this has not been tested.
 ```python
 from hogescraper import HogeScraper
