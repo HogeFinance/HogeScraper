@@ -15,7 +15,7 @@ class Contract(object):
 		self.set_contract_address(contract_address)
 		self.set_contract()
 
-	def w3(self):
+	def w3(self) -> Chain:
 		"""Return w3 object"""
 		return self._w3
 

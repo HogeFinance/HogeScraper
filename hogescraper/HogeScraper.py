@@ -3,6 +3,7 @@ import json
 import requests
 
 from .Contract import Contract
+from .Chain import Chain
 
 class HogeScraper(object):
 
@@ -10,11 +11,11 @@ class HogeScraper(object):
 		self._contract = Contract(infura_api_key)
 		self.set_user_address(user_address)
 
-	def contract(self):
+	def contract(self) -> Contract:
 		"""Return contract wrapper object"""
 		return self._contract
 
-	def w3(self):
+	def w3(self) -> Chain:
 		"""Return w3 wrapper object"""
 		return self.contract().w3()
 
