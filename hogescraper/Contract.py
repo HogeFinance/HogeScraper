@@ -6,11 +6,11 @@ class Contract(object):
 
 	def __init__(
 		self, 
-		infura_api_key: str, 
-		contract_address: str ='0xfad45e47083e4607302aa43c65fb3106f1cd7607', 
+		ankr_api_key: str, 
+		contract_address: str ='0xDfF7fcF6a86F7Dc86E7facECA502851f82a349A6', 
 		abi: str = ''
 	):
-		self._w3 = Chain(infura_api_key)
+		self._w3 = Chain(ankr_api_key)
 		self.set_abi(abi)
 		self.set_contract_address(contract_address)
 		self.set_contract()

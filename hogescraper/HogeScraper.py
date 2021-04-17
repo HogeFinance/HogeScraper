@@ -7,8 +7,8 @@ from .Chain import Chain
 
 class HogeScraper(object):
 
-	def __init__(self, infura_api_key: str, user_address: str = ''):
-		self._contract = Contract(infura_api_key)
+	def __init__(self, ankr_api_key: str, user_address: str = ''):
+		self._contract = Contract(ankr_api_key)
 		self.set_user_address(user_address)
 
 	def contract(self) -> Contract:

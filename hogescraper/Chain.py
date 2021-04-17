@@ -2,12 +2,12 @@ from web3 import Web3
 
 class Chain(object):
 
-	def __init__(self, infura_api_key: str = ''):
-		self.set_w3(infura_api_key)
+	def __init__(self, ankr_api_key: str = ''):
+		self.set_w3(ankr_api_key)
 
-	def set_w3(self, infura_api_key: str):
-		"""Instantiate w3 object with infura API key"""
-		self._w3 = Web3(Web3.HTTPProvider('https://mainnet.infura.io/v3/%s' % infura_api_key))
+	def set_w3(self, ankr_api_key: str):
+		"""Instantiate w3 object with ankr API key"""
+		self._w3 = Web3(Web3.HTTPProvider('https://apis.ankr.com/%s' % ankr_api_key))
 
 	def get_w3(self) -> object:
 		"""Get w3 Object"""
