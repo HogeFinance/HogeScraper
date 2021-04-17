@@ -1,3 +1,15 @@
+# xdai hogescraper
+# mod by zembahk
+changes to the work with xdai network using ankr
+
+```python
+scraper = HogeScraper('ANKR_API_ENDPOINT')
+scraper.set_user_address('XDAI_HOGE_WALLET')
+```
+https://www.ankr.com/ endpoint used (the part after https://app.ankr.com/api/details/ when you make an xdai api)
+
+
+# Durendal's
 # HogeScraper:
 Python Module for scraping Hoge data
 
