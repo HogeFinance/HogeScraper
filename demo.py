@@ -21,6 +21,8 @@ def main():
 	print("Current Balance: %.09f" % scraper.get_total_tokens(address, 'xdai'))
 	print("Current Buys: %.09f" % scraper.get_bought_tokens(address, 'xdai'))
 	print("Profits: %.09f" % scraper.get_redistribution(address, 'xdai'))
-		
+	print("Total Balance in %s: %.09f" % ('usd', scraper.convert_total_balance(currency='usd', address=address, network='xdai')))
+	print("Redistribution rewards in %s: %.09f" % ('usd', scraper.convert_redistribution(currency='usd', address=address, network='xdai')))
+
 if __name__ == '__main__':
 	main()

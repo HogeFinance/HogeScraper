@@ -1,3 +1,5 @@
+from threading import Lock
+
 from web3 import Web3
 
 class Contract(object):
@@ -8,6 +10,7 @@ class Contract(object):
 		address: str,
 		abi: str = ''
 	):
+		self._lock = Lock()
 		self.set_w3(w3)
 		self.set_abi(abi)
 		self.set_contract_address(address)
@@ -15,20 +18,24 @@ class Contract(object):
 
 	def set_abi(self, abi: str = None):
 		"""Set contract ABI"""
-		self._abi = abi
+		with self._lock:
+			self._abi = abi
 
 	def set_contract_address(self, address: str):
 		"""Set address of Hoge contract"""
-		if self.w3().isAddress(address):
-			self._contract_address = self.w3().toChecksumAddress(address)
+		with self._lock:
+			if self.w3().isAddress(address):
+				self._contract_address = self.w3().toChecksumAddress(address)
 
 	def set_contract(self):
 		"""Instantiate contract object"""
-		self._contract = self.w3().eth.contract(address=self.contract_address(), abi=self.abi())
+		with self._lock:
+			self._contract = self.w3().eth.contract(address=self.contract_address(), abi=self.abi())
 
 	def set_w3(self, w3):
 		"""Set the contracts Web3 instance"""
-		self._w3 = w3
+		with self._lock:
+			self._w3 = w3
 
 	def w3(self) -> Web3:
 		"""Return the contracts Web3 instance"""
