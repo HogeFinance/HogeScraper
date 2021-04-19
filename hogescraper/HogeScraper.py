@@ -1,3 +1,4 @@
+from threading import Lock
 import json
 import os
 
@@ -9,6 +10,7 @@ from .Chain import Chain
 class HogeScraper(object):
 
 	def __init__(self, api_key: str = '', user_address: str = ''):
+		self._lock = Lock()
 		abi = open('%s/HOGE_ABI.json' % os.path.dirname(os.path.realpath(__file__)), 'r').read()
 
 		self._networks = {
@@ -34,8 +36,16 @@ class HogeScraper(object):
 
 	def add_network(self, name: str, provider: str, api_key: str = ''):
 		"""Add a network"""
-		self._networks[name] = {'provider': provider}
-		self._chains[name] = Chain(api_key=api_key, name=name, provider=provider)
+		with self._lock:
+			self._networks[name] = {'provider': provider}
+			self._chains[name] = Chain(api_key=api_key, name=name, provider=provider)
+
+	def remove_network(self, name: str):
+		"""Remove network"""
+		if name in self._networks.keys() and name in self._chains.keys():
+			with self._lock:
+				del self._networks[name]
+				del self._chains[name]
 
 	def network(self, name: str = 'eth') -> Chain:
 		"""Return the network instance for `name`"""
