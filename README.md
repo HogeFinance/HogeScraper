@@ -56,6 +56,7 @@ if __name__ == '__main__':
 Although HogeScraper will work out of the box with the HOGE smart contract, you can specify a custom ABI and smart contract address to the Contract class, in theory its wrapped methods should work with any ERC-20 however this has not been tested.
 ```python
 from hogescraper import HogeScraper
+from hogescraper.contracts import ERC20
 
 def main():
 	abi = open('CONTRACT_ABI.json').read()
@@ -63,8 +64,8 @@ def main():
 	scraper = HogeScraper('INFURA_API_KEY')
 	address = 'YOUR_ETH_ADDRESS_HOLDING_ERC20'
 	contract_name = "CONTRACT_NAME"
-	scraper.network('eth').add_contract(name=contract_name, abi=abi, address=contract_address)
-	
+	scraper.network(name).add_contract(name='hoge', contract=ERC20(w3=scraper.network('eth').w3(), abi=abi, address=contract_address))	
+		
 	# Token info
 	print("Symbol: %s" % scraper.network('eth').contract(contract_name).symbol())
 	print("Current Balance: %.09f" % scraper.get_total_tokens(address=address, network='eth', contract=contract_name))
@@ -78,11 +79,12 @@ if __name__ == '__main__':
 HogeScraper comes pre-configured to connect to the ethereum and xDai chains, it can programatically add additional chains as long as you specify a provider
 ```python
 from hogescraper import HogeScraper
+from hogescraper.providers import Local
+from hogescraper.contracts import ERC20
 
 def main():
 	name = 'custom chain'
-	provider = 'http://localhost:8545'
-	api_key = 'API_KEY'
+	provider = Local(url='http://localhost', port=8545, name='local')
 
 	abi = open('CONTRACT_ABI.json').read()
 	contract_address = 'CUSTOM_ERC20_CONTRACT_ADDRESS'
@@ -90,8 +92,8 @@ def main():
 	contract_name = "CONTRACT_NAME"
 
 	scraper = HogeScraper()
-	scraper.add_network(name=name, provider=provider, api_key=api_key)
-	scraper.network(name).add_contract(name=contract_name, abi=abi, address=contract_address)
+	scraper.add_network(name=name, provider=provider)
+	scraper.network(name).add_contract(name=contract_name, contract=ERC20(w3=scraper.network('eth').w3(), abi=abi, address=contract_address))	
 
 if __name__ == '__main__':
 	main()
