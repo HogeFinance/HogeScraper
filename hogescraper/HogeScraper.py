@@ -29,19 +29,19 @@ class HogeScraper(object):
 
 		# Add Hoge Contracts for ETH and xDai networks
 		for name, chain in self._chains.items():
-			if self._chains[name].w3().isConnected():
-				self._chains[name].add_contract(name='hoge', abi=abi, address=self._networks[name]['hoge_addr'])
+			if self.network(name).w3().isConnected():
+				self.network(name).add_contract(name='hoge', abi=abi, address=self._networks[name]['hoge_addr'])
 
-	def network(self, name: str) -> Chain:
+	def network(self, name: str = 'eth') -> Chain:
 		"""Return the network instance for `name`"""
 		if name in self._chains.keys():
 			return self._chains[name]
 
-	def w3(self, network: str) -> Web3:
-		"""Return w3 wrapper object"""
+	def w3(self, network: str = 'eth') -> Web3:
+		"""Return w3 object"""
 		return self.network(network).w3()
 
-	def get_buys(self, address: str, network: str, contract: str = 'hoge') -> list:
+	def get_buys(self, address: str, network: str = 'eth', contract: str = 'hoge') -> list:
 		"""Retrieve list of Transfer events for each purchase"""
 		if self.w3(network).isAddress(address):
 			try:
@@ -57,20 +57,20 @@ class HogeScraper(object):
 				print("Error: %s" % e)
 				return []
 
-	def get_bought_tokens(self, address: str, network: str, contract: str = 'hoge') -> float:
+	def get_bought_tokens(self, address: str, network: str = 'eth', contract: str = 'hoge') -> float:
 		"""Get sum of purchased tokens"""
 		transfers = self.get_buys(address, network, contract)
 		buys = [transfer['args']['value'] for transfer in transfers]
 		return float(sum([self.w3(network).fromWei(buy, 'nano') for buy in buys]))
 
-	def get_total_tokens(self, address: str, network: str, contract: str = 'hoge') -> float:
+	def get_total_tokens(self, address: str, network: str = 'eth', contract: str = 'hoge') -> float:
 		"""Get total Hoge balance"""
 		if self.w3(network).isAddress(address):
 			return float(self.w3(network).fromWei(
 				self.network(network).contract(contract).contract().functions.balanceOf(self.w3(network).toChecksumAddress(address)).call(), 'nano'
 			))
 
-	def get_redistribution(self, address: str, network: str, contract: str = 'hoge') -> float:
+	def get_redistribution(self, address: str, network: str = 'eth', contract: str = 'hoge') -> float:
 		"""Calculate redistribution earnings"""
 		return float(self.get_total_tokens(address, network, contract) - self.get_bought_tokens(address, network, contract))
 
@@ -78,15 +78,15 @@ class HogeScraper(object):
 		"""Get hoge price in numerous currencies"""
 		data = json.loads(
 			requests.get(
-				'https://api.coingecko.com/api/v3/coins/ethereum/contract/%s' % self.network(network).contract(contract).contract_address()
+				'https://api.coingecko.com/api/v3/coins/ethereum/contract/%s' % self._networks['eth']['hoge_addr']
 			).text
 		)
 		return float(data['market_data']['current_price'][currency.lower()])
 
-	def convert_total_balance(self, address: str, network: str, contract: str = 'hoge', currency: str = 'usd') -> float:
+	def convert_total_balance(self, address: str, network: str = 'eth', contract: str = 'hoge', currency: str = 'usd') -> float:
 		"""Convert value of all held tokens to `currency`"""
 		return float(self.get_price(currency) * self.get_total_tokens(address, network, contract))
 
-	def convert_redistribution(self, address: str, network: str, contract: str = 'hoge', currency: str = 'usd') -> float:
+	def convert_redistribution(self, address: str, network: str = 'eth', contract: str = 'hoge', currency: str = 'usd') -> float:
 		"""Convert value of all held redistribution rewards to `currency`"""
 		return float(self.get_price(currency) * self.get_redistribution(address, network, contract))
