@@ -3,13 +3,13 @@ from threading import Lock
 from web3 import Web3
 
 from .Contract import Contract
+from .Provider import Provider
 
 class Chain(object):
 
-	def __init__(self, api_key: str = '', name: str = '', provider: str = ''):
+	def __init__(self, provider: Provider, name: str = ''):
 		self._lock = Lock()
 		self._contracts = {}
-		self.set_api_key(api_key)
 		self.set_name(name)
 		self.set_provider(provider)
 		self.set_w3()
@@ -19,12 +19,7 @@ class Chain(object):
 		with self._lock:
 			self._name = name
 
-	def set_api_key(self, api_key: str):
-		"""Set API Key for this network provider"""
-		with self._lock:
-			self._api_key = api_key
-
-	def set_provider(self, network: str):
+	def set_provider(self, network: Provider):
 		"""Set the network provider to use"""
 		with self._lock:
 			self._provider = network
@@ -32,7 +27,7 @@ class Chain(object):
 	def set_w3(self):
 		"""Instantiate w3 object with the designated provider"""
 		with self._lock:
-			self._w3 = Web3(Web3.HTTPProvider(self.provider()))
+			self._w3 = Web3(Web3.HTTPProvider(self.provider().provider()))
 
 	def add_contract(self, name: str, abi: str, address: str):
 		"""Add a new contract from this network"""
@@ -65,7 +60,7 @@ class Chain(object):
 		"""Return this network providers API key"""
 		return self._api_key
 
-	def provider(self) -> str:
+	def provider(self) -> Provider:
 		"""Return currently set provider"""
 		return self._provider
 

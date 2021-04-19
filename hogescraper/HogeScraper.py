@@ -6,39 +6,40 @@ import requests
 from web3 import Web3
 
 from .Chain import Chain
+from .Provider import XDai, Infura, Local, Provider
 
 class HogeScraper(object):
 
 	def __init__(self, api_key: str = '', user_address: str = ''):
 		self._lock = Lock()
 		abi = open('%s/HOGE_ABI.json' % os.path.dirname(os.path.realpath(__file__)), 'r').read()
-
 		self._networks = {
 			'eth': {
-				'provider': 'https://mainnet.infura.io/v3/%s' % api_key,
+				'provider': Infura(api_key=api_key, name="eth", url="https://mainnet.infura.io/v3"),
 				'hoge_addr': '0xfad45e47083e4607302aa43c65fb3106f1cd7607',
 			},
 			'xdai': {
-				'provider': 'https://rpc.xdaichain.com/',
+				'provider': XDai(name="xdai", url="https://rpc.xdaichain.com/"),
 				'hoge_addr': '0xDfF7fcF6a86F7Dc86E7facECA502851f82a349A6'
+			},
+			'local': {
+				'provider': Local(name="local", url="http://localhost", port=8545),
 			}
 		}
-
-		self._chains = {
-			'eth': Chain(api_key=api_key, name='eth', provider=self._networks['eth']['provider']),
-			'xdai': Chain(name='xdai', provider=self._networks['xdai']['provider'])
-		}
+		self._chains = {}
+		for name, data in self._networks.items():
+			self._chains[name] = Chain(name=name, provider=data['provider'])
 
 		# Add Hoge Contracts for ETH and xDai networks
 		for name, chain in self._chains.items():
 			if self.network(name).w3().isConnected():
 				self.network(name).add_contract(name='hoge', abi=abi, address=self._networks[name]['hoge_addr'])
 
-	def add_network(self, name: str, provider: str, api_key: str = ''):
+	def add_network(self, name: str, provider: Provider):
 		"""Add a network"""
 		with self._lock:
 			self._networks[name] = {'provider': provider}
-			self._chains[name] = Chain(api_key=api_key, name=name, provider=provider)
+			self._chains[name] = Chain(name=name, provider=provider)
 
 	def remove_network(self, name: str):
 		"""Remove network"""
