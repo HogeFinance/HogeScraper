@@ -2,7 +2,7 @@ from threading import Lock
 
 from web3 import Web3
 
-from .Contract import Contract
+from .contracts import Contract, ERC20, ERC721
 from .providers import Provider
 
 class Chain(object):
@@ -29,10 +29,18 @@ class Chain(object):
 		with self._lock:
 			self._w3 = Web3(Web3.HTTPProvider(self.provider().provider()))
 
-	def add_contract(self, name: str, abi: str, address: str):
+	def add_contract(self, name: str, contract: Contract):
 		"""Add a new contract from this network"""
 		with self._lock:
-			self._contracts[name] = Contract(w3=self.w3(), abi=abi, address=address)
+			self._contracts[name] = contract
+
+	def add_erc20(self, name: str, contract: ERC20):
+		"""Add an ERC20 Contract"""
+		self.add_contract(name, contract)
+
+	def add_erc721(self, name:str, contract: ERC721):
+		"""Add an ERC721 Contract"""
+		self.add_contract(name, contract)
 
 	def remove_contract(self, name) -> bool:
 		"""Remove a contract from the networks list of contracts"""

@@ -7,6 +7,7 @@ from web3 import Web3
 
 from .Chain import Chain
 from .providers import XDai, Infura, Local, Provider
+from .contracts import ERC20, ERC721, Contract
 
 class HogeScraper(object):
 
@@ -26,32 +27,29 @@ class HogeScraper(object):
 				'provider': Local(name="local", url="http://localhost", port=8545),
 			}
 		}
-		self._chains = {}
-		for name, data in self._networks.items():
-			self._chains[name] = Chain(name=name, provider=data['provider'])
 
+		
 		# Add Hoge Contracts for ETH and xDai networks
-		for name, chain in self._chains.items():
+		for name, data in self._networks.items():
+			data['chain'] = Chain(name=name, provider=data['provider'])
 			if self.network(name).w3().isConnected():
-				self.network(name).add_contract(name='hoge', abi=abi, address=self._networks[name]['hoge_addr'])
+				self.network(name).add_contract(name='hoge', contract=ERC20(w3=self.network(name).w3(), abi=abi, address=data['hoge_addr']))	
 
 	def add_network(self, name: str, provider: Provider):
 		"""Add a network"""
 		with self._lock:
-			self._networks[name] = {'provider': provider}
-			self._chains[name] = Chain(name=name, provider=provider)
+			self._networks[name] = {'provider': provider, 'chain': Chain(name=name, provider=provider)}
 
 	def remove_network(self, name: str):
 		"""Remove network"""
-		if name in self._networks.keys() and name in self._chains.keys():
+		if name in self._networks.keys():
 			with self._lock:
 				del self._networks[name]
-				del self._chains[name]
 
 	def network(self, name: str = 'eth') -> Chain:
 		"""Return the network instance for `name`"""
-		if name in self._chains.keys():
-			return self._chains[name]
+		if name in self._networks.keys():
+			return self._networks[name]['chain']
 
 	def w3(self, network: str = 'eth') -> Web3:
 		"""Return w3 object"""
