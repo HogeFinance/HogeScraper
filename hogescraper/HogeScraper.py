@@ -6,7 +6,7 @@ import requests
 from web3 import Web3
 
 from .Chain import Chain
-from .Provider import XDai, Infura, Local, Provider
+from .providers import XDai, Infura, Local, Provider
 
 class HogeScraper(object):
 

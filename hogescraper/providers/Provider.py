@@ -44,21 +44,3 @@ class Provider(ABC):
 	def provider(self) -> str:
 		"""Get provider address"""
 		pass
-
-class Infura(Provider):
-
-	def provider(self) -> str:
-		"""Get provider address"""
-		return "%s/%s" % (self.url(), self.api_key())
-
-class XDai(Provider):
-
-	def provider(self) -> str:
-		"""Get provider address"""
-		return self.url()
-
-class Local(Provider):
-
-	def provider(self) -> str:
-		"""Get provider address"""
-		return "%s:%d" % (self.url(), self.port())

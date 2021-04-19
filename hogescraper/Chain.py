@@ -3,7 +3,7 @@ from threading import Lock
 from web3 import Web3
 
 from .Contract import Contract
-from .Provider import Provider
+from .providers import Provider
 
 class Chain(object):
 
