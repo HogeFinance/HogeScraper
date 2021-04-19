@@ -3,7 +3,7 @@ Python Module for scraping Hoge data
 
 HogeScraper is an all-in-one utility to let you track your purchased hoge, current hoge balance(with redistribution rewards), isolate exactly how many redistribution rewards you currently hold, and get the current price in a number of currencies such as: USD, CAD, AUD, BTC, etc...
 
-It currently leverages several sources to get its data. Primarily it reads from the ethereum blockchain, and as such an [Infura API Key](https://infura.io/) is required. This allows HogeScraper to filter transfer events sent to your address(your Hoge purchases) as well as query the contract for your current balance. Additionally price data is fed in from coingeckos API.
+It currently leverages several sources to get its data. Primarily it reads from the ethereum and xDai blockchains, and as such an [Infura API Key](https://infura.io/) is required. This allows HogeScraper to filter transfer events sent to your address(your Hoge purchases) as well as query the contract for your current balance. Additionally price data is fed in from coingeckos API.
 
 # Installation:
 To install HogeScraper enter the following commands(Windows, Linux, or macOS)
@@ -20,22 +20,25 @@ from hogescraper import HogeScraper
 
 def main():
 	scraper = HogeScraper('INFURA_API_KEY')
-	scraper.set_user_address('YOUR_ETH_ADDRESS_HOLDING_HOGE')
-
-	# Token info
-	print("Symbol: %s" % scraper.contract().symbol())
-	print("Current Balance: %.09f" % scraper.get_total_tokens())
-	print("Current Buys: %.09f" % scraper.get_bought_tokens())
-	print("Profits: %.09f" % scraper.get_redistribution())
-
-	# Print Prices
-	print("Price in USD: %.09f" % scraper.get_price())
-	print("Price in CAD: %.09f" % scraper.get_price('cad'))
+	address = 'ETH_ADDRESS_HOLDING_HOGE'
 	
-	# Print Balances and Rewards
-	for currency in ['usd', 'cad', 'aud', 'btc']:
-		print("Total Balance in %s: %.09f" % (currency, scraper.convert_total_balance(currency)))
-		print("Redistribution rewards in %s: %.09f" % (currency, scraper.convert_redistribution(currency)))
+	# Eth network
+	print("Symbol: %s" % scraper.network('eth').contract('hoge').symbol())
+	print("Name: %s" % scraper.network('eth').contract('hoge').name())
+	print("Total Supply: %.09f" % scraper.network('eth').contract('hoge').total_supply())
+	print("Current Balance: %.09f" % scraper.get_total_tokens(address, 'eth'))
+	print("Current Buys: %.09f" % scraper.get_bought_tokens(address, 'eth'))
+	print("Profits: %.09f" % scraper.get_redistribution(address, 'eth'))
+	print("Total Balance in %s: %.09f" % ('usd', scraper.convert_total_balance(currency='usd', address=address, network='eth')))
+	print("Redistribution rewards in %s: %.09f" % ('usd', scraper.convert_redistribution(currency='usd', address=address, network='eth')))
+
+	# xDai network
+	print("Symbol: %s" % scraper.network('xdai').contract('hoge').symbol())
+	print("Name: %s" % scraper.network('xdai').contract('hoge').name())
+	print("Total Supply: %.09f" % scraper.network('xdai').contract('hoge').total_supply())
+	print("Current Balance: %.09f" % scraper.get_total_tokens(address, 'xdai'))
+	print("Current Buys: %.09f" % scraper.get_bought_tokens(address, 'xdai'))
+	print("Profits: %.09f" % scraper.get_redistribution(address, 'xdai'))
 		
 if __name__ == '__main__':
 	main()
@@ -50,15 +53,14 @@ def main():
 	abi = open('CONTRACT_ABI.json').read()
 	contract_address = 'CUSTOM_ERC20_CONTRACT_ADDRESS'
 	scraper = HogeScraper('INFURA_API_KEY')
-	scraper.set_user_address('YOUR_ETH_ADDRESS_HOLDING_ERC20')
-	scraper.contract().set_abi(abi)
-	scraper.contract().set_contract_address(contract_address)
-	scraper.contract().set_contract()
-
+	address = 'YOUR_ETH_ADDRESS_HOLDING_ERC20'
+	contract_name = "CONTRACT_NAME"
+	scraper.network('eth').add_contract(name=contract_name, abi=abi, address=contract_address)
+	
 	# Token info
-	print("Symbol: %s" % scraper.contract().symbol())
-	print("Current Balance: %.09f" % scraper.get_total_tokens())
-	print("Current Buys: %.09f" % scraper.get_bought_tokens())
+	print("Symbol: %s" % scraper.network('eth').contract(contract_name).symbol())
+	print("Current Balance: %.09f" % scraper.get_total_tokens(address=address, network='eth', contract=contract_name))
+	print("Current Buys: %.09f" % scraper.get_bought_tokens(address=address, network='eth', contract=contract_name))
 		
 if __name__ == '__main__':
 	main()

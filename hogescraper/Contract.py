@@ -1,82 +1,82 @@
-import requests
-
-from .Chain import Chain
+from web3 import Web3
 
 class Contract(object):
 
 	def __init__(
-		self, 
-		infura_api_key: str, 
-		contract_address: str ='0xfad45e47083e4607302aa43c65fb3106f1cd7607', 
+		self,
+		w3: Web3,
+		address: str,
 		abi: str = ''
 	):
-		self._w3 = Chain(infura_api_key)
+		self.set_w3(w3)
 		self.set_abi(abi)
-		self.set_contract_address(contract_address)
+		self.set_contract_address(address)
 		self.set_contract()
-
-	def w3(self) -> Chain:
-		"""Return w3 object"""
-		return self._w3
 
 	def set_abi(self, abi: str = None):
 		"""Set contract ABI"""
-		if not abi:
-			abi = requests.get('https://raw.githubusercontent.com/HogeFinance/token/main/Contract%20ABI').text
 		self._abi = abi
 
 	def set_contract_address(self, address: str):
 		"""Set address of Hoge contract"""
-		if self.w3().is_address(address):
-			self._contract_address = self.w3().to_checksum_address(address)
+		if self.w3().isAddress(address):
+			self._contract_address = self.w3().toChecksumAddress(address)
 
 	def set_contract(self):
 		"""Instantiate contract object"""
-		self._contract = self.w3().get_w3().eth.contract(address=self.get_contract_address(), abi=self.get_abi())
+		self._contract = self.w3().eth.contract(address=self.contract_address(), abi=self.abi())
 
-	def get_abi(self) -> str:
+	def set_w3(self, w3):
+		"""Set the contracts Web3 instance"""
+		self._w3 = w3
+
+	def w3(self) -> Web3:
+		"""Return the contracts Web3 instance"""
+		return self._w3
+
+	def abi(self) -> str:
 		"""Get contract ABI"""
 		return self._abi
 
-	def get_contract_address(self) -> str:
+	def contract_address(self) -> str:
 		"""Get contract address"""
 		return self._contract_address
 
-	def get_contract(self) -> object:
+	def contract(self) -> object:
 		"""Return contract object"""
 		return self._contract
 
 	def balance_of(self, address) -> float:
 		"""Return balance of `address`"""
-		if self.w3().is_address(address):
-			address = self.w3().to_checksum_address(address)
-			return float(self.w3().from_wei(
-				self.get_contract().functions.balanceOf(address).call(), 'nano'
+		if self.w3().isAddress(address):
+			address = self.w3().toChecksumAddress(address)
+			return float(self.w3().fromWei(
+				self.contract().functions.balanceOf(address).call(), 'nano'
 			))
 
 	def symbol(self) -> str:
 		"""Return token symbol"""
-		return self.get_contract().functions.symbol().call()
+		return self.contract().functions.symbol().call()
 
 	def decimals(self) -> int:
 		"""Return decimal points in token"""
-		return int(self.get_contract().functions.decimals().call())
+		return int(self.contract().functions.decimals().call())
 
 	def total_supply(self) -> float:
 		"""Return token total supply"""
-		return float(self.get_contract().functions.totalSupply().call())
+		return float(self.w3().fromWei(self.contract().functions.totalSupply().call(), "nano"))
 
 	def name(self) -> str:
 		"""Return token name"""
-		return self.get_contract().functions.name().call()
+		return self.contract().functions.name().call()
 
 	def allowance(self, owner, spender) -> float:
 		"""Return allocated allowance from owner to spender"""
-		if self.w3().is_address(owner) and self.w3().is_address(spender):
-			owner = self.w3().to_checksum_address(owner)
-			spender = self.w3().to_checksum_address(spender)
-			return float(self.w3().from_wei(
-				self.get_contract().functions.allowance(owner, spender).call(), 'nano'
+		if self.w3().isAddress(owner) and self.w3().isAddress(spender):
+			owner = self.w3().toChecksumAddress(owner)
+			spender = self.w3().toChecksumAddress(spender)
+			return float(self.w3().fromWei(
+				self.contract().functions.allowance(owner, spender).call(), 'nano'
 			))
 
 

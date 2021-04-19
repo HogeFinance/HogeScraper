@@ -1,35 +1,65 @@
 from web3 import Web3
 
+from .Contract import Contract
+
 class Chain(object):
 
-	def __init__(self, infura_api_key: str = ''):
-		self.set_w3(infura_api_key)
+	def __init__(self, api_key: str = '', name: str = '', provider: str = ''):
+		self._contracts = {}
+		self.set_api_key(api_key)
+		self.set_name(name)
+		self.set_provider(provider)
+		self.set_w3()
 
-	def set_w3(self, infura_api_key: str):
-		"""Instantiate w3 object with infura API key"""
-		self._w3 = Web3(Web3.HTTPProvider('https://mainnet.infura.io/v3/%s' % infura_api_key))
+	def set_name(self, name: str):
+		"""Set the network name"""
+		self._name = name
 
-	def get_w3(self) -> object:
+	def set_api_key(self, api_key: str):
+		"""Set API Key for this network provider"""
+		self._api_key = api_key
+
+	def set_provider(self, network: str):
+		"""Set the network provider to use"""
+		self._provider = network
+
+	def set_w3(self):
+		"""Instantiate w3 object with the designated provider"""
+		self._w3 = Web3(Web3.HTTPProvider(self.provider()))
+
+	def add_contract(self, name: str, abi: str, address: str):
+		"""Add a new contract from this network"""
+		self._contracts[name] = Contract(w3=self.w3(), abi=abi, address=address)
+
+	def remove_contract(self, name) -> bool:
+		"""Remove a contract from the networks list of contracts"""
+		if name in self._contracts.keys():
+			del self._contracts[name]
+			return True
+		return False
+
+	def contract(self, name: str) -> object:
+		"""Return a given contract for this network"""
+		if name in self._contracts.keys():
+			return self._contracts[name]
+		raise Exception("Contract not found")
+
+	def contracts(self) -> object:
+		"""Return all contracts associated with this network"""
+		return self._contracts
+
+	def name(self) -> str:
+		"""Return the name of the network"""
+		return self._name
+
+	def api_key(self) -> str:
+		"""Return this network providers API key"""
+		return self._api_key
+
+	def provider(self) -> str:
+		"""Return currently set provider"""
+		return self._provider
+
+	def w3(self) -> Web3:
 		"""Get w3 Object"""
 		return self._w3
-
-	def is_address(self, address: str) -> bool:
-		"""Check if a string is a valid address"""
-		return self.get_w3().isAddress(address)
-
-	def to_checksum_address(self, address: str) -> str:
-		"""Convert an address to checksum format"""
-		if self.is_address(address):
-			return self.get_w3().toChecksumAddress(address)
-
-	def is_connected(self) -> bool:
-		"""Check if self._w3 is connected to the blockchain"""
-		return self.get_w3().isConnected()
-
-	def from_wei(self, val: int, decimals: str = 'nano') -> float:
-		"""Convert a value from wei to another format"""
-		return float(self.get_w3().fromWei(val, decimals))
-
-	def to_wei(self, val: int, decimals: str = 'nano') -> float:
-		"""Convert a value to wei from another format"""
-		return float(self.get_w3().toWei(val, decimals))
