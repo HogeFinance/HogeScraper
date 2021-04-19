@@ -32,6 +32,11 @@ class HogeScraper(object):
 			if self.network(name).w3().isConnected():
 				self.network(name).add_contract(name='hoge', abi=abi, address=self._networks[name]['hoge_addr'])
 
+	def add_network(self, name: str, provider: str, api_key: str = ''):
+		"""Add a network"""
+		self._networks[name] = {'provider': provider}
+		self._chains[name] = Chain(api_key=api_key, name=name, provider=provider)
+
 	def network(self, name: str = 'eth') -> Chain:
 		"""Return the network instance for `name`"""
 		if name in self._chains.keys():

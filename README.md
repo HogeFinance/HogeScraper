@@ -68,7 +68,28 @@ if __name__ == '__main__':
 	main()
 ```
 
-Future versions may include the ability to run off a local full node instead of infura. More documentation to come.
+# Other Networks:
+HogeScraper comes pre-configured to connect to the ethereum and xDai chains, it can programatically add additional chains as long as you specify a provider
+```python
+from hogescraper import HogeScraper
+
+def main():
+	name = 'custom chain'
+	provider = 'http://localhost:8545'
+	api_key = 'API_KEY'
+
+	abi = open('CONTRACT_ABI.json').read()
+	contract_address = 'CUSTOM_ERC20_CONTRACT_ADDRESS'
+	address = 'YOUR_ETH_ADDRESS_HOLDING_ERC20'
+	contract_name = "CONTRACT_NAME"
+
+	scraper = HogeScraper()
+	scraper.add_network(name=name, provider=provider, api_key=api_key)
+	scraper.network(name).add_contract(name=contract_name, abi=abi, address=contract_address)
+
+if __name__ == '__main__':
+	main()
+```
 
 ## Donations:
 To help support development of this and any other tools I write that you may enjoy, please consider sending a donation to one of the following addresses:
