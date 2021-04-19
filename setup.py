@@ -4,7 +4,7 @@ import os
 
 LIB_NAME    = 'hogescraper'
 DESCRIPTION = 'Python module to scrape Hogecoin data'
-VERSION     = '0.0.1'
+VERSION     = '0.0.2'
 AUTHOR      = 'Durendal'
 EMAIL       = 'durendal@durendals-domain.com'
 URL         = 'https://github.com/Durendal/HogeScraper'
