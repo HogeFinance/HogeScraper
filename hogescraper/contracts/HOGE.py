@@ -14,7 +14,7 @@ class HOGE(ERC20):
 
 	def reflection_from_token(self, t_amount: int, deduct_transfer_fee: bool) -> float:
 		"""Calculate reflection from tokens"""
-			return float(self.w3().fromWei(
+		return float(self.w3().fromWei(
 				self.contract().functions.reflectionFromToken(t_amount, deduct_transfer_fee).call(), 'nano'
 			))
 

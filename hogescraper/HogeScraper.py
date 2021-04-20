@@ -7,7 +7,7 @@ from web3 import Web3
 
 from .Chain import Chain
 from .providers import XDai, Infura, Local, Provider, BNB
-from .contracts import ERC20
+from .contracts import HOGE
 
 class HogeScraper(object):
 
@@ -36,7 +36,7 @@ class HogeScraper(object):
 		for name, data in self._networks.items():
 			data['chain'] = Chain(name=name, provider=data['provider'])
 			if self.network(name).w3().isConnected() and 'hoge_addr' in data.keys():
-				self.network(name).add_contract(name='hoge', contract=ERC20(w3=self.network(name).w3(), abi=abi, address=data['hoge_addr']))	
+				self.network(name).add_contract(name='hoge', contract=HOGE(w3=self.network(name).w3(), abi=abi, address=data['hoge_addr']))	
 
 	def add_network(self, name: str, provider: Provider):
 		"""Add a network"""
