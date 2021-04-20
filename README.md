@@ -52,6 +52,53 @@ if __name__ == '__main__':
 	main()
 ```
 
+# Threading:
+HogeScraper should be thread-safe. Each Contract and Chain object has an internal lock that controls access to all state changing methods
+```python
+from queue import Queue
+from threading import Thread
+
+from hogescraper import HogeScraper
+
+def threaded_balance_of(address, scraper):
+	while True:
+		addr = address.get()
+		print("%s balance: %.09f" % (addr, scraper.network('eth').contract('hoge').balance_of(addr)))
+		address.task_done()
+
+def main():
+
+	num_threads = 10
+	addresses = Queue(maxsize=0)
+	scraper = HogeScraper('INFURA_API_KEY')
+
+	# Initialize threads
+	threadpool = [Thread(target=threaded_balance_of, args=(addresses, scraper))]
+	
+	# Start threads
+	for thread in threadpool:
+		thread.setDaemon(True)
+		thread.start()
+
+	# Randomly sourced addresses from etherscan and feed queue
+	[addresses.put(addr) for addr in [
+		'0x947174ed842afe3e7246801f036709743f9ee994',
+		'0xedca5d37d33a69b69dff9ccfadc4aa20dc42949d',
+		'0xe79ea8f930c475c219fe882cc3a536e9861a2f6a',
+		'0xa11584b769ae31c52c9e7a6c559be6c3106b73de',
+		'0x4209c80442ac1da6ceb34e77da25cda9b36aaff7',
+		'0x0f52dab01d18e1d3bd8876700c4613ff207939dd',
+		'0xcbeef760e0be52361a79f9951f1a535238804b26',
+		'0xde44f07688f43f48c8af7f18fb8883384a4157a5',
+		'0x058409a0d8c12f6e949a4e0f1e6d70ee02f7e574']
+	]
+
+	addresses.join()
+
+if __name__ == '__main__':
+	main()
+```
+
 # Other ERC-20s:
 Although HogeScraper will work out of the box with the HOGE smart contract, you can specify a custom ABI and smart contract address to the Contract class, in theory its wrapped methods should work with any ERC-20 however this has not been tested.
 ```python
