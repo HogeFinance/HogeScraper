@@ -70,10 +70,10 @@ def main():
 
 	num_threads = 10
 	addresses = Queue(maxsize=0)
-	scraper = HogeScraper('INFURA_API_KEY')
+	scraper = HogeScraper('d557fda7eecd49b1861f860a9a45f4a5')
 
 	# Initialize threads
-	threadpool = [Thread(target=threaded_balance_of, args=(addresses, scraper))]
+	threadpool = [Thread(target=threaded_balance_of, args=(addresses, scraper)) for i in range(num_threads)]
 	
 	# Start threads
 	for thread in threadpool:
