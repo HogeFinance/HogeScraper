@@ -1,6 +1,6 @@
-__all__ = ["HogeScraper", "Contract", "Chain", "Provider"]
+__all__ = ["HogeScraper", "Chain", "providers", "contracts"]
 
 from .HogeScraper import HogeScraper
-from .Contract import Contract
 from .Chain import Chain
+from .contracts import Contract, ERC20, ERC721
 from .providers import Provider, Infura, XDai, Local
