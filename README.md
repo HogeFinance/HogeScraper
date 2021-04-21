@@ -60,7 +60,7 @@ if __name__ == '__main__':
 ```
 
 # Threading:
-HogeScraper should be thread-safe. Each Contract and Chain object has an internal lock that controls access to all state changing methods
+HogeScraper should be thread-safe. Each Contract and Chain object has an internal lock that controls access to all state changing methods(also see [get_addr.py](https://github.com/Durendal/HogeScraper/blob/main/get_addrs.py))
 ```python
 from queue import Queue
 from threading import Thread
