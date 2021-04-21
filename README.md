@@ -3,7 +3,7 @@ Python Module for scraping Hoge data
 
 HogeScraper is an all-in-one utility to let you track your purchased hoge, current hoge balance(with redistribution rewards), isolate exactly how many redistribution rewards you currently hold, and get the current price in a number of currencies such as: USD, CAD, AUD, BTC, etc...
 
-It currently leverages several sources to get its data. Primarily it reads from the ethereum and xDai blockchains, and as such an [Infura API Key](https://infura.io/) is required. This allows HogeScraper to filter transfer events sent to your address(your Hoge purchases) as well as query the contract for your current balance. Additionally price data is fed in from coingeckos API.
+It currently leverages several sources to get its data. Primarily it reads from the ethereum and xDai blockchains, and as such an [Infura API Key](https://infura.io/), or a local node(lite or full) is required. This allows HogeScraper to filter transfer events sent to your address(your Hoge purchases) as well as query the contract for your current balance. Additionally price data is fed in from coingeckos API.
 
 # Installation:
 To install HogeScraper enter the following commands(Windows, Linux, or macOS)
@@ -12,6 +12,13 @@ git clone https://github.com/Durendal/HogeScraper.git
 cd HogeScraper
 pip install .
 ```
+
+# Setup a local lite-node:
+Make sure you have [installed geth](https://geth.ethereum.org/docs/install-and-build/installing-geth), then enter the following command in a terminal. 
+```bash
+geth --syncmode "light" --rpcapi eth,web3,debug,txpool,admin --rpc --rpcport=8545
+```
+Open [etherscan](https://www.etherscan.io) in another window and check what the latest block is. Once the latest block geth shows coincides with etherscan your node should be sync'd(this usually takes a few minutes). Once sync'd you should be able to use the 'local' network for ethereum requests(useful if you don't have a paid Infura subscription)
 
 # Basic Use:
 
