@@ -1,6 +1,14 @@
+from web3 import Web3
+import requests
+
 from .ERC20 import ERC20
 
 class SafeMoon(ERC20):
+
+	def __init__(self, w3: Web3):
+		abi = requests.get('http://api.bscscan.com/api?module=contract&action=getabi&address=0x8076c74c5e3f5852037f31ff0093eeb8c8add8d3&format=raw').text
+		address = '0x8076C74C5e3F5852037F31Ff0093Eeb8c8ADd8D3'
+		super().__init__(abi=abi, address=address, w3=w3)
 
 	def _liquidity_fee(self) -> int:
 		"""Check if address is in redistribution exclusion list"""

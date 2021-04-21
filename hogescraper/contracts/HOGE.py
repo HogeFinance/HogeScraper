@@ -1,6 +1,18 @@
+from web3 import Web3
+import requests
+
 from .ERC20 import ERC20
 
 class HOGE(ERC20):
+	
+	def __init__(self, w3: Web3, network: str = 'eth'):
+		abi = requests.get('https://raw.githubusercontent.com/HogeFinance/token/main/Contract%20ABI').text
+		addresses = { 
+			'eth': '0xfad45e47083e4607302aa43c65fb3106f1cd7607',
+			'xdai': '0xDfF7fcF6a86F7Dc86E7facECA502851f82a349A6'
+		}
+		address = addresses[network] if network in addresses.keys() else 'eth'
+		super().__init__(abi=abi, address=address, w3=w3)
 
 	def is_excluded(self, address: str) -> bool:
 		"""Check if address is in redistribution exclusion list"""
