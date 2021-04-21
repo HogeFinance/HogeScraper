@@ -40,7 +40,7 @@ def get_address(blocks, addrs, scraper, lock, current):
 		block = blocks.get()
 		try:
 			end_block = (block + 1000) if (block + 1000) <= current else current
-			address_filter = scraper.network('eth').contract('hoge').contract().events.Transfer.createFilter(
+			address_filter = scraper.network('eth').contract('hoge').events().Transfer.createFilter(
 				fromBlock=block,
 				toBlock=end_block, 
 			)
@@ -55,7 +55,7 @@ def get_address(blocks, addrs, scraper, lock, current):
 			addrs.put(tx['args']['from'])
 
 		with lock:
-			sys.stdout.write("\rBlocks #%d-%d had %d tx's" % (block, end_block, len(txs)))
+			sys.stdout.write("\rBlocks #%d-%d had %d tx's      " % (block, end_block, len(txs)))
 			sys.stdout.flush()
 
 		blocks.task_done()
