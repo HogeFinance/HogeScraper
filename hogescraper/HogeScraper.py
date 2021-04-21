@@ -13,7 +13,6 @@ class HogeScraper(object):
 
 	def __init__(self, api_key: str = '', user_address: str = ''):
 		self._lock = Lock()
-		abi = open('%s/HOGE_ABI.json' % os.path.dirname(os.path.realpath(__file__)), 'r').read()
 		self._networks = {
 			'eth': {
 				'provider': Infura(api_key=api_key),
