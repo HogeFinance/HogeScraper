@@ -12,20 +12,24 @@ class Counter(object):
 		self._lock = Lock()
 
 	def increment(self):
+		"""Increment counter by 1"""
 		with self._lock:
 			self._val += 1
 
 	def decrement(self):
+		"""Decrement counter by 1"""
 		with self._lock:
 			self._val -= 1
 
 	def value(self):
+		"""Return current counter value"""
 		return self._val
 
 def threaded_balance_of(addrs, scraper, lock, bals, counter):
 	while True:
 		addr = addrs.get()
 		bal  = scraper.network('eth').contract('hoge').balance_of(addr)
+		# Uncomment below to populate bals queue
 		#bals.put((addr, bal))
 		counter.increment()
 		if counter.value() % 100 == 0:
@@ -47,6 +51,7 @@ def get_address(blocks, addrs, scraper, lock, current):
 			
 			txs = address_filter.get_all_entries()
 		except ValueError as e:
+			# Filter doesnt exist ¯\_(ツ)_/¯ clear job from blocks queue and move along
 			blocks.task_done()
 			continue
 
@@ -59,7 +64,6 @@ def get_address(blocks, addrs, scraper, lock, current):
 			sys.stdout.flush()
 
 		blocks.task_done()
-
 
 def main():
 	# Begin tracking execution time
@@ -83,7 +87,6 @@ def main():
 	unique_addrs = Queue(maxsize=0)
 	counter      = Counter()
 
-
 	# Create threadpools for each phase
 	addr_pool    = [Thread(target=get_address, args=(blocks, addrs, scraper, output_lock, current)) for i in range(thread_count)]
 	bal_pool     = [Thread(target=threaded_balance_of, args=(unique_addrs, scraper, output_lock, bals, counter)) for i in range(thread_count)]
@@ -97,7 +100,9 @@ def main():
 	[blocks.put(i) for i in range(deployed_at, current, 1000)]
 
 	blocks.join()
+
 	print()
+
 	# Filter out any duplicate address entries
 	addresses   = set([addrs.get() for i in range(addrs.qsize())])
 	[unique_addrs.put(addr) for addr in addresses]
