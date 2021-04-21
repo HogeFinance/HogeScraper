@@ -7,7 +7,7 @@ from web3 import Web3
 
 from .Chain import Chain
 from .providers import XDai, Infura, Local, Provider, BSC
-from .contracts import HOGE
+from .contracts import HOGE, SafeMoon
 
 class HogeScraper(object):
 
@@ -33,8 +33,12 @@ class HogeScraper(object):
 		for name, data in self._networks.items():
 			data['chain'] = Chain(name=name, provider=data['provider'])
 			if self.network(name).w3().isConnected() and name in ['eth', 'xdai', 'local']:
-				self.network(name).add_contract(name='hoge', contract=HOGE(w3=self.network(name).w3()))	
-				
+				self.network(name).add_erc20(name='hoge', contract=HOGE(w3=self.network(name).w3(), network=name))
+
+			# Add safemoon
+			elif self.network(name).w3().isConnected() and name == 'binance':
+				self.network(name).add_erc20(name='safemoon', contract=SafeMoon(w3=self.network(name).w3()))
+
 	def add_network(self, name: str, provider: Provider):
 		"""Add a network"""
 		with self._lock:
@@ -92,7 +96,7 @@ class HogeScraper(object):
 		"""Get hoge price in numerous currencies"""
 		data = json.loads(
 			requests.get(
-				'https://api.coingecko.com/api/v3/coins/ethereum/contract/%s' % self._networks['eth']['hoge_addr']
+				'https://api.coingecko.com/api/v3/coins/ethereum/contract/%s' % self.network('eth').contract('hoge').contract_address()
 			).text
 		)
 		return float(data['market_data']['current_price'][currency.lower()])

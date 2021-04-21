@@ -14,15 +14,15 @@ class SafeMoon(ERC20):
 		"""Check if address is in redistribution exclusion list"""
 		self.contract().functions._liquidityFee().call()
 		
-	def _max_tx_amount(self): -> float:
+	def _max_tx_amount(self) -> float:
 		return float(self.w3().fromWei(
 				self.contract().functions._maxTxAmount().call(), 'nano'
 			))
 
-	def _tax_fee(self): -> int:
+	def _tax_fee(self) -> int:
 		return self.contract().functions._taxFee().call()
 
-	def get_unlock_time(self): -> int:
+	def get_unlock_time(self) -> int:
 		return self.contract().functions.getUnlockTime().call()
 
 	def is_excluded_from_fee(self, address: str) -> bool:
@@ -30,8 +30,6 @@ class SafeMoon(ERC20):
 
 	def is_excluded_from_reward(self, address: str) -> bool:
 		return self.contract().functions.isExcludedFromReward(address).call()
-
-	def reflection_from_token(self, t_amount: int, deduct_transfer_fee: bool) -> 
 
 	def owner(self) -> str:
 		"""Return the owner of the contract"""
