@@ -84,11 +84,11 @@ def main():
 	deployed_at = 11809212 
 
 	# Create threadpools for each phase
-	thread_pool1 = [Thread(target=get_address, args=(blocks, addrs, scraper, output_lock, current)) for i in range(thread_count)]
-	thread_pool2 = [Thread(target=threaded_balance_of, args=(unique_addrs, scraper, output_lock, bals, counter)) for i in range(thread_count)]
+	address_thread_pool = [Thread(target=get_address, args=(blocks, addrs, scraper, output_lock, current)) for i in range(thread_count)]
+	balance_thread_pool = [Thread(target=threaded_balance_of, args=(unique_addrs, scraper, output_lock, bals, counter)) for i in range(thread_count)]
 	
 	# Start address scraping threads
-	for thread in thread_pool1:
+	for thread in address_thread_pool:
 		thread.setDaemon(True)
 		thread.start()		
 	
@@ -102,7 +102,7 @@ def main():
 	[unique_addrs.put(addr) for addr in addresses]
 	
 	# Start balance scraping threads
-	for thread in thread_pool2:
+	for thread in balance_thread_pool:
 		thread.setDaemon(True)
 		thread.start()
 
