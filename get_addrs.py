@@ -37,7 +37,7 @@ def threaded_balance_of(addrs, scraper, lock, bals, counter):
 
 def get_address(blocks, addrs, scraper, lock, current):
 	while True:
-		block   = blocks.get()
+		block = blocks.get()
 		try:
 			end_block = (block + 1000) if (block + 1000) <= current else current
 			address_filter = scraper.network('eth').contract('hoge').events().Transfer.createFilter(
