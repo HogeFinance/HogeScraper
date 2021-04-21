@@ -5,14 +5,30 @@ import sys
 
 from hogescraper import HogeScraper
 
+class Counter(object):
+	def __init__(self):
+		self._val = 0
+		self._lock = Lock()
+
+	def increment(self):
+		with self._lock:
+			self._val += 1
+
+	def decrement(self):
+		with self._lock:
+			self._val -= 1
+
+	def value(self):
+		return self._val
+
 def threaded_balance_of(addrs, bals, scraper, lock, counter):
 	while True:
 		addr = addrs.get()
 		bal = scraper.network('eth').contract('hoge').balance_of(addr)
 		#bals.put((addr, bal))
 		with lock:
-			counter += 1
-			sys.stdout.write("\rProcessed %d Addresses\t\t\t" % counter)
+			counter.increment()
+			sys.stdout.write("\rProcessed %d Addresses" % counter.value())
 			sys.stdout.flush()
 			
 		addrs.task_done()
@@ -33,20 +49,20 @@ def get_address(blocks, addrs, scraper, lock, current):
 			addrs.put(tx['args']['from'])
 
 		with lock:
-			sys.stdout.write("\rBlocks #%d-%d had %d tx's\t\t\t" % (block, end_block, len(txs)))
+			sys.stdout.write("\r                              Blocks #%d-%d had %d tx's              " % (block, end_block, len(txs)))
 			sys.stdout.flush()
 
 		blocks.task_done()
 
 
 def main():
-	thread_count = 20
+	thread_count = 15
 	startTime = datetime.now()
 	oLock = Lock()
 	blocks = Queue(maxsize=0)
 	addrs = Queue(maxsize=0)
 	bals = Queue(maxsize=0)
-	counter = 0
+	counter = Counter()
 	scraper = HogeScraper('INFURA_API_KEY')
 	current = scraper.network('eth').w3().eth.getBlock('latest')['number'] # Current block number
 	deployed_at = 11809212 # Block Hoge was deployed at
@@ -67,15 +83,15 @@ def main():
 
 	blocks.join()
 	
-	addresses = set([addrs.get() for i in range(addrs.qsize())])
-	[addrs.put(addr) for addr in addresses]
+	#addresses = set([addrs.get() for i in range(addrs.qsize())])
+	#[addrs.put(addr) for addr in addresses]
 	
 	print()
 
 	addrs.join()
 	execution = datetime.now() - startTime
 	#print(addresses)
-	print("\nFound %d unique addresses holding Hoge" % len(addresses))
+	print("\nFound %d unique addresses holding Hoge" % counter.value())
 	print("Execution Time:", execution)
 
 if __name__ == '__main__':
