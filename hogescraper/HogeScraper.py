@@ -6,9 +6,9 @@ import requests
 from web3 import Web3
 
 from .Chain import Chain
-from .providers import XDai, Infura, Local, Provider, BSC
+from .providers import Provider, XDai, Infura, Local, BSC
 from .contracts import HOGE, SafeMoon
-from .prices import CoinGecko
+from .prices import Price, CoinGecko
 
 class HogeScraper(object):
 
@@ -43,16 +43,21 @@ class HogeScraper(object):
 			elif self.network(name).w3().isConnected() and name == 'binance':
 				self.network(name).add_erc20(name='safemoon', contract=SafeMoon(w3=self.network(name).w3()))
 
-	def add_network(self, name: str, provider: Provider):
+	def add_network(self, name: str, provider: Provider) -> bool:
 		"""Add a network"""
-		with self._lock:
-			self._networks[name] = {'provider': provider, 'chain': Chain(name=name, provider=provider)}
+		if name not in self._networks.keys():
+			with self._lock:
+				self._networks[name] = {'provider': provider, 'chain': Chain(name=name, provider=provider)}
+			return True
+		return False
 
-	def remove_network(self, name: str):
+	def remove_network(self, name: str) -> bool:
 		"""Remove network"""
 		if name in self._networks.keys():
 			with self._lock:
 				del self._networks[name]
+			return True
+		return False
 
 	def network(self, name: str = 'eth') -> Chain:
 		"""Return the network instance for `name`"""
@@ -62,8 +67,25 @@ class HogeScraper(object):
 	def w3(self, network: str = 'eth') -> Web3:
 		"""Return w3 object"""
 		return self.network(network).w3()
+	
+	def add_price(self, name: str, price_provider: Price) -> bool:
+		"""Add a price provider"""
+		if name not in self._prices.keys():
+			with self._lock:
+				self._prices[name] = price_provider
+			return True
+		return False
 
-	def prices(self, name: str) -> dict:
+	def remove_price(self, name: str) -> bool:
+		"""Remove a price provider"""
+		if name in self._prices.keys():
+			with self._lock:
+				del self._prices[name]
+			return True
+		return False
+
+	def prices(self, name: str) -> Price:
+		"""Return price tracking provider"""
 		if name in self._prices.keys():
 			return self._prices[name]
 
@@ -104,7 +126,7 @@ class HogeScraper(object):
 		"""Get hoge price in numerous currencies"""
 		return self.prices(price_provider).price()[currency.lower()]
 
-	def get_historical_price(self, date: str, currency: str = 'usd', price_provider: str = 'coingecko'):
+	def get_historical_price(self, date: str, currency: str = 'usd', price_provider: str = 'coingecko') -> float:
 		"""Return the price of hoge at a given date"""
 		return self.prices(price_provider).historical_price(date)[currency.lower()]
 
