@@ -6,6 +6,7 @@ import sys
 from hogescraper import HogeScraper
 
 class Counter(object):
+	"""Thread-safe counter object"""
 	def __init__(self):
 		self._val = 0
 		self._lock = Lock()
@@ -21,77 +22,95 @@ class Counter(object):
 	def value(self):
 		return self._val
 
-def threaded_balance_of(addrs, bals, scraper, lock, counter):
+def threaded_balance_of(addrs, scraper, lock, bals, counter):
 	while True:
 		addr = addrs.get()
 		bal = scraper.network('eth').contract('hoge').balance_of(addr)
 		#bals.put((addr, bal))
-		with lock:
-			counter.increment()
-			sys.stdout.write("\rProcessed %d Addresses" % counter.value())
-			sys.stdout.flush()
+		counter.increment()
+		if counter.value() % 100 == 0:
+			with lock:
+				sys.stdout.write("\rProcessed %d Addresses" % counter.value())
+				sys.stdout.flush()
 			
 		addrs.task_done()
 
 def get_address(blocks, addrs, scraper, lock, current):
 	while True:
 		block = blocks.get()
-		end_block = (block + 1000) if (block + 1000) <= current else current
-		address_filter = scraper.network('eth').contract('hoge').contract().events.Transfer.createFilter(
-			fromBlock=block,
-			toBlock=end_block, 
-		)
-		
-		txs = address_filter.get_all_entries()
-		
+		try:
+			end_block = (block + 1000) if (block + 1000) <= current else current
+			address_filter = scraper.network('eth').contract('hoge').contract().events.Transfer.createFilter(
+				fromBlock=block,
+				toBlock=end_block, 
+			)
+			
+			txs = address_filter.get_all_entries()
+		except ValueError as e:
+			blocks.task_done()
+			continue
+
 		for tx in txs:
 			addrs.put(tx['args']['to'])
 			addrs.put(tx['args']['from'])
 
 		with lock:
-			sys.stdout.write("\r                              Blocks #%d-%d had %d tx's              " % (block, end_block, len(txs)))
+			sys.stdout.write("\rBlocks #%d-%d had %d tx's" % (block, end_block, len(txs)))
 			sys.stdout.flush()
 
 		blocks.task_done()
 
 
 def main():
-	thread_count = 15
-	startTime = datetime.now()
-	oLock = Lock()
+	# Begin tracking execution time
+	start_time = datetime.now()
+	
+	# Define number of threads for each phase to instantiate
+	thread_count = 20
+	
+	# Define thread variables
+	output_lock = Lock()
 	blocks = Queue(maxsize=0)
 	addrs = Queue(maxsize=0)
 	bals = Queue(maxsize=0)
+	unique_addrs = Queue(maxsize=0)
 	counter = Counter()
-	scraper = HogeScraper('INFURA_API_KEY')
-	current = scraper.network('eth').w3().eth.getBlock('latest')['number'] # Current block number
-	deployed_at = 11809212 # Block Hoge was deployed at
 
-	thread_pool1 = [Thread(target=get_address, args=(blocks, addrs, scraper, oLock, current)) for i in range(thread_count)]
-	thread_pool2 = [Thread(target=threaded_balance_of, args=(addrs, bals, scraper, oLock, counter)) for i in range(thread_count)]
+	scraper = HogeScraper('INFURA_API_KEY')
 	
+	# Current block number
+	current = scraper.network('eth').w3().eth.getBlock('latest')['number'] 
+	# Block Hoge was deployed at
+	deployed_at = 11809212 
+
+	# Create threadpools for each phase
+	thread_pool1 = [Thread(target=get_address, args=(blocks, addrs, scraper, output_lock, current)) for i in range(thread_count)]
+	thread_pool2 = [Thread(target=threaded_balance_of, args=(unique_addrs, scraper, output_lock, bals, counter)) for i in range(thread_count)]
+	
+	# Start address scraping threads
 	for thread in thread_pool1:
 		thread.setDaemon(True)
 		thread.start()		
-	
-	for thread in thread_pool2:
-		thread.setDaemon(True)
-		thread.start()
 	
 	# Populate blocks Queue, 1000 block increments
 	[blocks.put(i) for i in range(deployed_at, current, 1000)]
 
 	blocks.join()
-	
-	#addresses = set([addrs.get() for i in range(addrs.qsize())])
-	#[addrs.put(addr) for addr in addresses]
-	
 	print()
+	# Filter out any duplicate address entries
+	addresses = set([addrs.get() for i in range(addrs.qsize())])
+	[unique_addrs.put(addr) for addr in addresses]
+	
+	# Start balance scraping threads
+	for thread in thread_pool2:
+		thread.setDaemon(True)
+		thread.start()
 
-	addrs.join()
-	execution = datetime.now() - startTime
-	#print(addresses)
-	print("\nFound %d unique addresses holding Hoge" % counter.value())
+	unique_addrs.join()
+
+	print("\nBalances Collected: %d" % bals.qsize())
+	execution = datetime.now() - start_time
+	print("\nFound %d unique addresses holding Hoge" % len(addresses))
 	print("Execution Time:", execution)
 
 if __name__ == '__main__':
