@@ -53,5 +53,9 @@ class Contract(object):
 		"""Return contract object"""
 		return self._contract
 
+	def events(self) -> object:
+		"""Return contract event object"""
+		return self.contract().events
+
 
 

@@ -17,28 +17,24 @@ class HogeScraper(object):
 		self._networks = {
 			'eth': {
 				'provider': Infura(api_key=api_key),
-				'hoge_addr': '0xfad45e47083e4607302aa43c65fb3106f1cd7607',
 			},
 			'xdai': {
 				'provider': XDai(),
-				'hoge_addr': '0xDfF7fcF6a86F7Dc86E7facECA502851f82a349A6'
 			},
 			'local': {
 				'provider': Local(),
-				'hoge_addr': '0xfad45e47083e4607302aa43c65fb3106f1cd7607',
 			},
 			'binance': {
 				'provider': BSC()
 			}
 		}
-
 		
 		# Add Hoge Contracts for ETH and xDai networks
 		for name, data in self._networks.items():
 			data['chain'] = Chain(name=name, provider=data['provider'])
-			if self.network(name).w3().isConnected() and 'hoge_addr' in data.keys():
-				self.network(name).add_contract(name='hoge', contract=HOGE(w3=self.network(name).w3(), abi=abi, address=data['hoge_addr']))	
-
+			if self.network(name).w3().isConnected() and name in ['eth', 'xdai', 'local']:
+				self.network(name).add_contract(name='hoge', contract=HOGE(w3=self.network(name).w3()))	
+				
 	def add_network(self, name: str, provider: Provider):
 		"""Add a network"""
 		with self._lock:
@@ -63,7 +59,7 @@ class HogeScraper(object):
 		"""Retrieve list of Transfer events for each purchase"""
 		if self.w3(network).isAddress(address):
 			try:
-				t_filter = self.network(network).contract(contract).contract().events.Transfer.createFilter(
+				t_filter = self.network(network).contract(contract).events().Transfer.createFilter(
 					fromBlock=0,
 					toBlock='latest', 
 					argument_filters={
