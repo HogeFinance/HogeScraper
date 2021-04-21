@@ -27,7 +27,7 @@ class Chain(object):
 	def set_w3(self):
 		"""Instantiate w3 object with the designated provider"""
 		with self._lock:
-			self._w3 = Web3(Web3.HTTPProvider(self.provider().provider(), request_kwargs={'timeout': 60}))
+			self._w3 = Web3(Web3.HTTPProvider(self.provider().provider(), request_kwargs={'timeout': 120}))
 
 	def add_contract(self, name: str, contract: Contract):
 		"""Add a new contract from this network"""
@@ -59,6 +59,10 @@ class Chain(object):
 	def contracts(self) -> object:
 		"""Return all contracts associated with this network"""
 		return self._contracts
+
+	def eth(self) -> object:
+		"""Return web3 eth object"""
+		return self.w3().eth
 
 	def name(self) -> str:
 		"""Return the name of the network"""

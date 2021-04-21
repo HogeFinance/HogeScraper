@@ -8,6 +8,7 @@ from web3 import Web3
 from .Chain import Chain
 from .providers import XDai, Infura, Local, Provider, BSC
 from .contracts import HOGE, SafeMoon
+from .prices import CoinGecko
 
 class HogeScraper(object):
 
@@ -26,6 +27,10 @@ class HogeScraper(object):
 			'binance': {
 				'provider': BSC()
 			}
+		}
+
+		self._prices = {
+			'coingecko': CoinGecko()
 		}
 		
 		# Add Hoge Contracts for ETH and xDai networks
@@ -57,6 +62,10 @@ class HogeScraper(object):
 	def w3(self, network: str = 'eth') -> Web3:
 		"""Return w3 object"""
 		return self.network(network).w3()
+
+	def prices(self, name: str) -> dict:
+		if name in self._prices.keys():
+			return self._prices[name]
 
 	def get_buys(self, address: str, network: str = 'eth', contract: str = 'hoge') -> list:
 		"""Retrieve list of Transfer events for each purchase"""
@@ -91,14 +100,13 @@ class HogeScraper(object):
 		"""Calculate redistribution earnings"""
 		return float(self.get_total_tokens(address, network, contract) - self.get_bought_tokens(address, network, contract))
 
-	def get_price(self, currency: str = 'usd', network: str = 'eth', contract: str = 'hoge') -> float:
+	def get_price(self, currency: str = 'usd', price_provider: str = 'coingecko') -> float:
 		"""Get hoge price in numerous currencies"""
-		data = json.loads(
-			requests.get(
-				'https://api.coingecko.com/api/v3/coins/ethereum/contract/%s' % self.network('eth').contract('hoge').contract_address()
-			).text
-		)
-		return float(data['market_data']['current_price'][currency.lower()])
+		return self.prices(price_provider).price()[currency.lower()]
+
+	def get_historical_price(self, date: str, currency: str = 'usd', price_provider: str = 'coingecko'):
+		"""Return the price of hoge at a given date"""
+		return self.prices(price_provider).historical_price(date)[currency.lower()]
 
 	def convert_total_balance(self, address: str, network: str = 'eth', contract: str = 'hoge', currency: str = 'usd') -> float:
 		"""Convert value of all held tokens to `currency`"""
