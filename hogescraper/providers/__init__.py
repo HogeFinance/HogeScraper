@@ -4,4 +4,4 @@ from .Provider import Provider
 from .Infura import Infura
 from .XDai import XDai
 from .Local import Local
-from .BNB import BNB
+from .BSC import BSC

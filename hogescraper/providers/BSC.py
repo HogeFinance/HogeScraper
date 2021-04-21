@@ -1,6 +1,6 @@
 from .Provider import Provider
 
-class BNB(Provider):
+class BSC(Provider):
 	def __init__(self, port: int = 443):
 		super().__init__(url='https://bsc-dataseed1.binance.org', name='binance', port=port)
 

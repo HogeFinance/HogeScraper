@@ -6,7 +6,7 @@ import requests
 from web3 import Web3
 
 from .Chain import Chain
-from .providers import XDai, Infura, Local, Provider, BNB
+from .providers import XDai, Infura, Local, Provider, BSC
 from .contracts import HOGE
 
 class HogeScraper(object):
@@ -25,9 +25,10 @@ class HogeScraper(object):
 			},
 			'local': {
 				'provider': Local(),
+				'hoge_addr': '0xfad45e47083e4607302aa43c65fb3106f1cd7607',
 			},
 			'binance': {
-				'provider': BNB()
+				'provider': BSC()
 			}
 		}
 
