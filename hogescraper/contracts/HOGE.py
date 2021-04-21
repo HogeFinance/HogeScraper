@@ -11,7 +11,7 @@ class HOGE(ERC20):
 			'eth': '0xfad45e47083e4607302aa43c65fb3106f1cd7607',
 			'xdai': '0xDfF7fcF6a86F7Dc86E7facECA502851f82a349A6'
 		}
-		address = addresses[network] if network in addresses.keys() else 'eth'
+		address = addresses[network] if network in addresses.keys() else addresses['eth']
 		super().__init__(abi=abi, address=address, w3=w3)
 
 	def is_excluded(self, address: str) -> bool:
