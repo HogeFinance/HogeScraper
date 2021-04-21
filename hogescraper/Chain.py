@@ -27,7 +27,7 @@ class Chain(object):
 	def set_w3(self):
 		"""Instantiate w3 object with the designated provider"""
 		with self._lock:
-			self._w3 = Web3(Web3.HTTPProvider(self.provider().provider()))
+			self._w3 = Web3(Web3.HTTPProvider(self.provider().provider(), request_kwargs={'timeout': 60}))
 
 	def add_contract(self, name: str, contract: Contract):
 		"""Add a new contract from this network"""
