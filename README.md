@@ -24,13 +24,14 @@ Open [etherscan](https://www.etherscan.io) in another window and check what the 
 
 ```python
 from hogescraper import HogeScraper
+from hogescraper.contracts import Contract
 
 def main():
 	scraper: HogeScraper = HogeScraper('INFURA_API_KEY')
 	address: str = 'ETH_ADDRESS_HOLDING_HOGE'
 
-	hoge_eth: 'Contract' = scraper.network('eth').contract('hoge')
-	hoge_xdai: 'Contract' = scraper.network('xdai').contract('hoge')
+	hoge_eth: Contract = scraper.network('eth').contract('hoge')
+	hoge_xdai: Contract = scraper.network('xdai').contract('hoge')
 	
 	# Eth network
 	print("Symbol: %s" % hoge_eth.symbol)
