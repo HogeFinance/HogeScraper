@@ -42,7 +42,8 @@ class Counter(object):
 		self._value = val
 
 def threaded_balance_of(
-	addrs: Queue, scraper: HogeScraper, 
+	addrs: Queue, 
+	scraper: HogeScraper, 
 	lock: Lock, 
 	bals: Queue, 
 	counter: Counter
