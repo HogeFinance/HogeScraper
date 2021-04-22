@@ -27,6 +27,7 @@ class Counter(object):
 		"""Get counter lock"""
 		return self._lock
 
+	@lock.setter
 	def lock(self, lock: Lock) -> None:
 		"""Set counter lock"""
 		self._lock = lock
@@ -51,7 +52,7 @@ def threaded_balance_of(
 	"""function to use for grabbing address balance in threads"""
 	while True:
 		addr: str = addrs.get()
-		bal: str  = scraper.network('eth').contract('hoge').balance_of(addr)
+		bal: str  = scraper.network('local').contract('hoge').balance_of(addr)
 		# Uncomment below to populate bals queue
 		#bals.put((addr, bal))
 		counter.increment()
@@ -74,7 +75,7 @@ def get_address(
 		block: int = blocks.get()
 		try:
 			end_block: int = (block + 1000) if (block + 1000) <= current else current
-			address_filter: 'web3._utils.filters.LogFilter' = scraper.network('eth').contract('hoge').events.Transfer.createFilter(
+			address_filter: 'web3._utils.filters.LogFilter' = scraper.network('local').contract('hoge').events.Transfer.createFilter(
 				fromBlock=block,
 				toBlock=end_block, 
 			)
@@ -105,7 +106,7 @@ def main():
 	scraper: HogeScraper = HogeScraper('INFURA_API_KEY')
 	
 	# Current block number
-	current: int         = scraper.network('eth').eth.getBlock('latest')['number'] 
+	current: int         = scraper.network('local').eth.getBlock('latest')['number'] 
 	# Block Hoge was deployed at
 	deployed_at: int     = 11809212 
 
