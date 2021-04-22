@@ -153,7 +153,7 @@ def main():
 
 	scraper = HogeScraper()
 	scraper.add_network(name=name, provider=provider)
-	scraper.network(name).add_contract(name=contract_name, contract=ERC20(w3=scraper.network('eth').w3, abi=abi, address=contract_address))	
+	scraper.network(name).add_contract(name=contract_name, contract=ERC20(w3=scraper.network(name).w3, abi=abi, address=contract_address))	
 
 if __name__ == '__main__':
 	main()
