@@ -4,7 +4,7 @@ import os
 
 LIB_NAME    = 'hogescraper'
 DESCRIPTION = 'Python module to scrape Hogecoin data'
-VERSION     = '0.0.2'
+VERSION     = '0.1.0'
 AUTHOR      = 'Durendal'
 EMAIL       = 'durendal@durendals-domain.com'
 URL         = 'https://github.com/Durendal/HogeScraper'
@@ -26,7 +26,7 @@ setup(
     zip_safe=False,
     install_requires=['web3', 'requests'],
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
         'Programming Language :: Python',

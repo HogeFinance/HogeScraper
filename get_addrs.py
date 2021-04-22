@@ -7,49 +7,78 @@ from hogescraper import HogeScraper
 
 class Counter(object):
 	"""Thread-safe counter object"""
-	def __init__(self):
-		self._val  = 0
-		self._lock = Lock()
+	def __init__(self) -> None:
+		"""Initialize counter object"""
+		self.value = 0
+		self.lock  = Lock()
 
-	def increment(self):
+	def increment(self) -> None:
 		"""Increment counter by 1"""
-		with self._lock:
-			self._val += 1
+		with self.lock:
+			self.value += 1
 
-	def decrement(self):
+	def decrement(self) -> None:
 		"""Decrement counter by 1"""
-		with self._lock:
-			self._val -= 1
+		with self.lock:
+			self.value -= 1
 
-	def value(self):
+	@property
+	def lock(self) -> Lock:
+		"""Get counter lock"""
+		return self._lock
+
+	def lock(self, lock: Lock) -> None:
+		"""Set counter lock"""
+		self._lock = lock
+
+	@property
+	def value(self) -> int:
 		"""Return current counter value"""
-		return self._val
+		return self._value
 
-def threaded_balance_of(addrs, scraper, lock, bals, counter):
+	@value.setter
+	def value(self, val: int) -> None:
+		"""Set counter value"""
+		self._value = val
+
+def threaded_balance_of(
+	addrs: Queue, scraper: HogeScraper, 
+	lock: Lock, 
+	bals: Queue, 
+	counter: Counter
+) -> None:
+	"""function to use for grabbing address balance in threads"""
 	while True:
-		addr = addrs.get()
-		bal  = scraper.network('eth').contract('hoge').balance_of(addr)
+		addr: str = addrs.get()
+		bal: str  = scraper.network('eth').contract('hoge').balance_of(addr)
 		# Uncomment below to populate bals queue
 		#bals.put((addr, bal))
 		counter.increment()
-		if counter.value() % 100 == 0:
+		if counter.value % 100 == 0:
 			with lock:
-				sys.stdout.write("\rProcessed %d Addresses" % counter.value())
+				sys.stdout.write("\rProcessed %d Addresses" % counter.value)
 				sys.stdout.flush()
 			
 		addrs.task_done()
 
-def get_address(blocks, addrs, scraper, lock, current):
+def get_address(
+	blocks: Queue, 
+	addrs: Queue, 
+	scraper: HogeScraper, 
+	lock: Lock, 
+	current: int
+) -> None:
+	"""function to use for grabbing address's holding hoge in threads"""
 	while True:
-		block = blocks.get()
+		block: int = blocks.get()
 		try:
-			end_block = (block + 1000) if (block + 1000) <= current else current
-			address_filter = scraper.network('eth').contract('hoge').events().Transfer.createFilter(
+			end_block: int = (block + 1000) if (block + 1000) <= current else current
+			address_filter: 'web3._utils.filters.LogFilter' = scraper.network('eth').contract('hoge').events.Transfer.createFilter(
 				fromBlock=block,
 				toBlock=end_block, 
 			)
 			
-			txs = address_filter.get_all_entries()
+			txs: list = address_filter.get_all_entries()
 		except ValueError as e:
 			# Filter doesnt exist ¯\_(ツ)_/¯ clear job from blocks queue and move along
 			blocks.task_done()
@@ -67,29 +96,29 @@ def get_address(blocks, addrs, scraper, lock, current):
 
 def main():
 	# Begin tracking execution time
-	start_time   = datetime.now()
+	start_time: datetime.datetime = datetime.now()
 	
-	# Define number of threads for each phase to instantiate
-	thread_count = 20
+	# Define number of threads to instantiate for each phase
+	thread_count: int    = 20
 	
-	scraper      = HogeScraper('INFURA_API_KEY')
+	scraper: HogeScraper = HogeScraper('INFURA_API_KEY')
 	
 	# Current block number
-	current      = scraper.network('eth').w3().eth.getBlock('latest')['number'] 
+	current: int         = scraper.network('eth').eth.getBlock('latest')['number'] 
 	# Block Hoge was deployed at
-	deployed_at  = 11809212 
+	deployed_at: int     = 11809212 
 
 	# Define thread variables
-	output_lock  = Lock()
-	blocks       = Queue(maxsize=0)
-	addrs        = Queue(maxsize=0)
-	bals         = Queue(maxsize=0)
-	unique_addrs = Queue(maxsize=0)
-	counter      = Counter()
+	output_lock: Lock    = Lock()
+	blocks: Queue        = Queue(maxsize=0)
+	addrs: Queue         = Queue(maxsize=0)
+	bals: Queue          = Queue(maxsize=0)
+	unique_addrs: Queue  = Queue(maxsize=0)
+	counter: Counter     = Counter()
 
 	# Create threadpools for each phase
-	addr_pool    = [Thread(target=get_address, args=(blocks, addrs, scraper, output_lock, current)) for i in range(thread_count)]
-	bal_pool     = [Thread(target=threaded_balance_of, args=(unique_addrs, scraper, output_lock, bals, counter)) for i in range(thread_count)]
+	addr_pool: list      = [Thread(target=get_address, args=(blocks, addrs, scraper, output_lock, current)) for i in range(thread_count)]
+	bal_pool: list       = [Thread(target=threaded_balance_of, args=(unique_addrs, scraper, output_lock, bals, counter)) for i in range(thread_count)]
 	
 	# Start address scraping threads
 	for thread in addr_pool:
@@ -104,7 +133,7 @@ def main():
 	print()
 
 	# Filter out any duplicate address entries
-	addresses   = set([addrs.get() for i in range(addrs.qsize())])
+	addresses: set = set([addrs.get() for i in range(addrs.qsize())])
 	[unique_addrs.put(addr) for addr in addresses]
 	
 	# Start balance scraping threads
@@ -115,7 +144,7 @@ def main():
 	unique_addrs.join()
 
 	print("\nBalances Collected: %d" % bals.qsize())
-	execution = datetime.now() - start_time
+	execution: datetime.timedelta = datetime.now() - start_time
 	print("\nFound %d unique addresses holding Hoge" % len(addresses))
 	print("Execution Time:", execution)
 

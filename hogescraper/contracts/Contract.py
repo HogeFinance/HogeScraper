@@ -9,53 +9,73 @@ class Contract(object):
 		w3: Web3,
 		address: str,
 		abi: str = ''
-	):
-		self._lock = Lock()
-		self.set_w3(w3)
-		self.set_abi(abi)
-		self.set_contract_address(address)
+	) -> None:
+		"""Instantiate contract on network defined by the passed in Web3 instance"""
+		self.lock: Lock = Lock()
+		self.w3: Web3 = w3
+		self.abi: str = abi
+		self.contract_address: str = address
 		self.set_contract()
 
-	def set_abi(self, abi: str = None):
-		"""Set contract ABI"""
-		with self._lock:
-			self._abi = abi
+	@property
+	def lock(self) -> Lock:
+		"""Return the Contract lock"""
+		return self._lock
 
-	def set_contract_address(self, address: str):
-		"""Set address of Hoge contract"""
-		with self._lock:
-			if self.w3().isAddress(address):
-				self._contract_address = self.w3().toChecksumAddress(address)
+	@lock.setter
+	def lock(self, lock: Lock) -> None:
+		"""Set the Contract lock"""
+		self._lock = lock
 
-	def set_contract(self):
-		"""Instantiate contract object"""
-		with self._lock:
-			self._contract = self.w3().eth.contract(address=self.contract_address(), abi=self.abi())
-
-	def set_w3(self, w3):
-		"""Set the contracts Web3 instance"""
-		with self._lock:
-			self._w3 = w3
-
-	def w3(self) -> Web3:
-		"""Return the contracts Web3 instance"""
-		return self._w3
-
+	@property
 	def abi(self) -> str:
 		"""Get contract ABI"""
 		return self._abi
 
+	@abi.setter
+	def abi(self, abi: str = None) -> None:
+		"""Set contract ABI"""
+		with self.lock:
+			self._abi = abi
+
+	@property
 	def contract_address(self) -> str:
 		"""Get contract address"""
 		return self._contract_address
 
-	def contract(self) -> object:
+	@contract_address.setter
+	def contract_address(self, address: str) -> None:
+		"""Set address of Hoge contract"""
+		with self.lock:
+			if self.w3.isAddress(address):
+				self._contract_address = self.w3.toChecksumAddress(address)
+
+	@property
+	def contract(self) -> 'web3._utils.datatypes.Contract':
 		"""Return contract object"""
 		return self._contract
 
-	def events(self) -> object:
+	
+	def set_contract(self) -> None:
+		"""Instantiate contract object"""
+		with self.lock:
+			self._contract = self.w3.eth.contract(address=self.contract_address, abi=self.abi)
+
+	@property
+	def w3(self) -> Web3:
+		"""Return the contracts Web3 instance"""
+		return self._w3
+
+	@w3.setter
+	def w3(self, w3: Web3) -> None:
+		"""Set the contracts Web3 instance"""
+		with self.lock:
+			self._w3 = w3
+
+	@property
+	def events(self) -> 'web3.contract.ContractEvents':
 		"""Return contract event object"""
-		return self.contract().events
+		return self.contract.events
 
 
 

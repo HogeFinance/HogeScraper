@@ -30,9 +30,9 @@ def main():
 	address = 'ETH_ADDRESS_HOLDING_HOGE'
 	
 	# Eth network
-	print("Symbol: %s" % scraper.network('eth').contract('hoge').symbol())
-	print("Name: %s" % scraper.network('eth').contract('hoge').name())
-	print("Total Supply: %.09f" % scraper.network('eth').contract('hoge').total_supply())
+	print("Symbol: %s" % scraper.network('eth').contract('hoge').symbol)
+	print("Name: %s" % scraper.network('eth').contract('hoge').name)
+	print("Total Supply: %.09f" % scraper.network('eth').contract('hoge').total_supply)
 	print("Current Balance: %.09f" % scraper.get_total_tokens(address))
 	print("Current Buys: %.09f" % scraper.get_bought_tokens(address))
 	print("Profits: %.09f" % scraper.get_redistribution(address))
@@ -44,9 +44,9 @@ def main():
 	print()
 
 	# xDai network
-	print("Symbol: %s" % scraper.network('xdai').contract('hoge').symbol())
-	print("Name: %s" % scraper.network('xdai').contract('hoge').name())
-	print("Total Supply: %.09f" % scraper.network('xdai').contract('hoge').total_supply())
+	print("Symbol: %s" % scraper.network('xdai').contract('hoge').symbol)
+	print("Name: %s" % scraper.network('xdai').contract('hoge').name)
+	print("Total Supply: %.09f" % scraper.network('xdai').contract('hoge').total_supply)
 	print("Current Balance: %.09f" % scraper.get_total_tokens(address, 'xdai'))
 	print("Current Buys: %.09f" % scraper.get_bought_tokens(address, 'xdai'))
 	print("Profits: %.09f" % scraper.get_redistribution(address, 'xdai'))
@@ -77,7 +77,7 @@ def main():
 
 	num_threads = 10
 	addresses = Queue(maxsize=0)
-	scraper = HogeScraper('d557fda7eecd49b1861f860a9a45f4a5')
+	scraper = HogeScraper('INFURA_API_KEY')
 
 	# Initialize threads
 	threadpool = [Thread(target=threaded_balance_of, args=(addresses, scraper)) for i in range(num_threads)]
@@ -118,10 +118,10 @@ def main():
 	scraper = HogeScraper('INFURA_API_KEY')
 	address = 'YOUR_ETH_ADDRESS_HOLDING_ERC20'
 	contract_name = "CONTRACT_NAME"
-	scraper.network(name).add_contract(name='hoge', contract=ERC20(w3=scraper.network('eth').w3(), abi=abi, address=contract_address))	
+	scraper.network(name).add_contract(name='hoge', contract=ERC20(w3=scraper.network('eth').w3, abi=abi, address=contract_address))	
 		
 	# Token info
-	print("Symbol: %s" % scraper.network('eth').contract(contract_name).symbol())
+	print("Symbol: %s" % scraper.network('eth').contract(contract_name).symbol)
 	print("Current Balance: %.09f" % scraper.get_total_tokens(address=address, network='eth', contract=contract_name))
 	print("Current Buys: %.09f" % scraper.get_bought_tokens(address=address, network='eth', contract=contract_name))
 		
@@ -147,7 +147,7 @@ def main():
 
 	scraper = HogeScraper()
 	scraper.add_network(name=name, provider=provider)
-	scraper.network(name).add_contract(name=contract_name, contract=ERC20(w3=scraper.network('eth').w3(), abi=abi, address=contract_address))	
+	scraper.network(name).add_contract(name=contract_name, contract=ERC20(w3=scraper.network('eth').w3, abi=abi, address=contract_address))	
 
 if __name__ == '__main__':
 	main()
