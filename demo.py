@@ -3,11 +3,14 @@ from hogescraper import HogeScraper
 def main():
 	scraper: HogeScraper = HogeScraper('INFURA_API_KEY')
 	address: str = 'ETH_ADDRESS_HOLDING_HOGE'
+
+	hoge_eth: 'Contract' = scraper.network('eth').contract('hoge')
+	hoge_xdai: 'Contract' = scraper.network('xdai').contract('hoge')
 	
 	# Eth network
-	print("Symbol: %s" % scraper.network('eth').contract('hoge').symbol)
-	print("Name: %s" % scraper.network('eth').contract('hoge').name)
-	print("Total Supply: %.09f" % scraper.network('eth').contract('hoge').total_supply)
+	print("Symbol: %s" % hoge_eth.symbol)
+	print("Name: %s" % hoge_eth.name)
+	print("Total Supply: %.09f" % hoge_eth.total_supply)
 	print("Current Balance: %.09f" % scraper.get_total_tokens(address))
 	print("Current Buys: %.09f" % scraper.get_bought_tokens(address))
 	print("Profits: %.09f" % scraper.get_redistribution(address))
@@ -21,9 +24,9 @@ def main():
 	print()
 
 	# xDai network
-	print("Symbol: %s" % scraper.network('xdai').contract('hoge').symbol)
-	print("Name: %s" % scraper.network('xdai').contract('hoge').name)
-	print("Total Supply: %.09f" % scraper.network('xdai').contract('hoge').total_supply)
+	print("Symbol: %s" % hoge_xdai.symbol)
+	print("Name: %s" % hoge_xdai.name)
+	print("Total Supply: %.09f" % hoge_xdai.total_supply)
 	print("Current Balance: %.09f" % scraper.get_total_tokens(address, 'xdai'))
 	print("Current Buys: %.09f" % scraper.get_bought_tokens(address, 'xdai'))
 	print("Profits: %.09f" % scraper.get_redistribution(address, 'xdai'))
