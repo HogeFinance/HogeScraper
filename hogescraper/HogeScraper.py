@@ -37,6 +37,7 @@ class HogeScraper(object):
 		# Add Hoge Contracts for ETH and xDai networks
 		for name, data in self._networks.items():
 			data['chain']: Chain = Chain(name=name, provider=data['provider'])
+			
 			if self.network(name).w3.isConnected() and name in ['eth', 'xdai', 'local']:
 				self.network(name).add_erc20(name='hoge', contract=HOGE(w3=self.network(name).w3, network=name))
 
@@ -53,6 +54,26 @@ class HogeScraper(object):
 	def lock(self, lock: Lock) -> None:
 		"""Set the HogeScraper lock"""
 		self._lock: Lock = lock
+
+	@property
+	def eth(self) -> Chain:
+		"""Return eth network"""
+		return self.network('eth')
+
+	@property
+	def xdai(self) -> Chain:
+		"""Return xdai network"""
+		return self.network('xdai')
+
+	@property
+	def local(self) -> Chain:
+		"""Return local network"""
+		return self.network('local')
+
+	@property
+	def binance(self) -> Chain:
+		"""Return binance network"""
+		return self.network('binance')
 
 	def add_network(self, name: str, provider: Provider) -> bool:
 		"""Add a network"""
