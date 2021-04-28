@@ -76,7 +76,7 @@ from hogescraper import HogeScraper
 def threaded_balance_of(address, scraper):
 	while True:
 		addr = address.get()
-		print("%s balance: %.09f" % (addr, scraper.network('eth').contract('hoge').balance_of(addr)))
+		print("%s balance: %.09f" % (addr, scraper.eth.contract('hoge').balance_of(addr)))
 		address.task_done()
 
 def main():
@@ -127,7 +127,7 @@ def main():
 	scraper.network(name).add_contract(name='hoge', contract=ERC20(w3=scraper.network('eth').w3, abi=abi, address=contract_address))	
 		
 	# Token info
-	print("Symbol: %s" % scraper.network('eth').contract(contract_name).symbol)
+	print("Symbol: %s" % scraper.eth.contract(contract_name).symbol)
 	print("Current Balance: %.09f" % scraper.get_total_tokens(address=address, network='eth', contract=contract_name))
 	print("Current Buys: %.09f" % scraper.get_bought_tokens(address=address, network='eth', contract=contract_name))
 		
