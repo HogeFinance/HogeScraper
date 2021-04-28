@@ -55,7 +55,7 @@ def threaded_balance_of(
 		if addr == '': 
 			addrs.task_done()
 			break
-		bal: str  = scraper.local.contract('hoge').balance_of(addr)
+		bal: str  = scraper.eth.contract('hoge').balance_of(addr)
 		# Uncomment below to populate bals queue
 		bals.put((addr, bal))
 		bals.task_done()
@@ -82,7 +82,7 @@ def get_address(
 			break
 		try:
 			end_block: int = (block + 1000) if (block + 1000) <= current else current
-			address_filter: 'web3._utils.filters.LogFilter' = scraper.local.contract('hoge').events.Transfer.createFilter(
+			address_filter: 'web3._utils.filters.LogFilter' = scraper.eth.contract('hoge').events.Transfer.createFilter(
 				fromBlock=block,
 				toBlock=end_block, 
 			)
